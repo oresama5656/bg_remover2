@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyTorch Model weights and caches
+*.pth
+*.pt
+*.bin
+*.onnx
+.cache/
+
+# Test output images and temporary files
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# HuggingFace hub cache
+.huggingface/
+
+# OS generated files
+.DS_Store
+Thumbs.db
