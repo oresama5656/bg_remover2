@@ -35,7 +35,7 @@ def init_session():
 # グローバルセッションを初期化 (app実行時に使い回すため)
 NET, DEVICE = init_session()
 
-def remove_background(input_image: Image.Image) -> Image.Image:
+def remove_background(input_image: Image.Image, threshold: int = 50) -> Image.Image:
     """
     PillowのImageオブジェクトを受け取り、背景透過後のImageオブジェクトを返します。
     """
@@ -70,15 +70,12 @@ def remove_background(input_image: Image.Image) -> Image.Image:
     # 【調整箇所】
     # result_imageのピクセルは0〜255の範囲。
     # しきい値を下げて、少しでも被写体らしき部分（薄いグレー等）は完全に残す(255にする)処理を追加する。
-    # Canvaのようなパキッとしたスタンプ透過に近づけるため、二値化(Binarization)を行います。
-    # 閾値（threshold）は 127 が標準的ですが、白フチが消える場合はしきい値を低く設定します。
-    THRESHOLD = 50 
-    
-    # NumPy配列を操作して、閾値以上のピクセルを255（完全不透明）に、未満を0（完全透明）にする
-    im_mask_np = np.where(result_image > THRESHOLD, 255, 0).astype(np.uint8)
-    
-    # OpenCV形式(numpy)のマスクをPillow画像に変換
-    pil_mask = Image.fromarray(im_mask_np).convert("L")
+    # 閾値を引数で受け取るように変更（0(残る)〜255(削れる)）
+    if threshold is not None and 0 <= threshold <= 255:
+        im_mask_np = np.where(result_image > threshold, 255, 0).astype(np.uint8)
+        pil_mask = Image.fromarray(im_mask_np).convert("L")
+    else:
+        pil_mask = Image.fromarray(result_image).convert("L")
     
     # バグ修正: input_image と pil_mask のサイズが（縦横の1ピクセル単位で）異なる場合に備え、
     # 確実に input_image の元のサイズにリサイズしてからアルファチャンネルとして適用する
